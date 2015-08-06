@@ -100,6 +100,15 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
     }
 
     /**
+     * Sets the HTTP status code for this document
+     * @param string $statusCode Status code
+     * @return null
+     */
+    public function setStatusCode($statusCode) {
+        $this->statusCode = $statusCode;
+    }
+
+    /**
      * Gets the HTTP status code for this document
      * @return string
      */
