@@ -174,6 +174,7 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
                 $data = $this->adaptResource($type, $data);
             }
 
+
             $collection[$index] = $data;
 
             $this->indexResource($data);
@@ -279,8 +280,9 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
     public function addIncluded(JsonApiResource $resource) {
         $type = $resource->getType();
         $id = $resource->getId();
+        $relationships = $resource->getRelationships();
 
-        if (isset($this->index[$type][$id]) || !$this->query->isResourceRequested($type) || (!$resource->getAttributes() && !$resource->getRelationships())) {
+        if (isset($this->index[$type][$id]) || (!$resource->getAttributes() && !$relationships)) {
             return false;
         }
 
@@ -291,6 +293,24 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
         }
 
         $this->included[$type][$id] = $resource;
+
+        $relationshipPath = $resource->getRelationshipPath();
+        foreach ($relationships as $name => $relationship) {
+            $fieldRelationshipPath = ($relationshipPath ? $relationshipPath . '.' : '') . $name;
+
+            if (!$this->query->isIncluded($fieldRelationshipPath)) {
+                continue;
+            }
+
+            $data = $relationship->getData();
+            if (is_array($data)) {
+                foreach ($data as $d) {
+                    $this->addIncluded($d);
+                }
+            } elseif ($data) {
+                $this->addIncluded($data);
+            }
+        }
 
         return true;
     }
