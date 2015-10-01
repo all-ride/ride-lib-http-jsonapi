@@ -40,6 +40,7 @@ class JsonApiResource extends AbstractLinkedJsonApiElement {
     public function __construct($type, $id = null) {
         $this->type = $type;
         $this->id = $id;
+        $this->relationshipPath = null;
         $this->attributes = array();
         $this->relationships = array();
     }
@@ -58,6 +59,24 @@ class JsonApiResource extends AbstractLinkedJsonApiElement {
      */
     public function getId() {
         return $this->id;
+    }
+
+    /**
+     * Sets the relationship path of this resource
+     * @param string $relationshipPath dot-separated list of the relationship
+     * name
+     * @return null
+     */
+    public function setRelationshipPath($relationshipPath = null) {
+        $this->relationshipPath = $relationshipPath;
+    }
+
+    /**
+     * Gets the relationship path of this resource
+     * @return string|null dot-separated list of the relationship name
+     */
+    public function getRelationshipPath() {
+        return $this->relationshipPath;
     }
 
     /**

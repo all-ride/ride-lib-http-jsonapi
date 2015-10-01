@@ -85,9 +85,10 @@ class BlogAdapter implements JsonApiResourceAdapter {
      * Gets a resource instance for the provided model data
      * @param mixed $data Data to adapt
      * @param JsonApiDocument $document Requested document
+     * @param string $relationshipPath dot-separated list of relationship names
      * @return JsonApiResource
      */
-    public function getResource($data, JsonApiDocument $document) {
+    public function getResource($data, JsonApiDocument $document, $relationshipPath = null) {
         $api = $document->getApi();
         $query = $document->getQuery();
 
@@ -100,7 +101,7 @@ class BlogAdapter implements JsonApiResourceAdapter {
         }
 
         // check for a relationship and set when requested        
-        if ($query->isFieldRequested(self::TYPE, 'author') && $query->isResourceRequested('people') && $api->increaseLevel()) {
+        if ($query->isFieldRequested(self::TYPE, 'author') && $query->isIncluded($relationshipPath) && $api->increaseLevel()) {
             // as last condition there is a increaseLevel, you can use this to determine the depth of recursiveness
             $peopleResourceAdapter = $api->getResourceAdapter('people');
             
@@ -114,7 +115,7 @@ class BlogAdapter implements JsonApiResourceAdapter {
         }        
         
         // set a relationship collection value        
-        if ($query->isFieldRequested(self::TYPE, 'tags') && $query->isResourceRequested('tags') && $api->increaseLevel()) {
+        if ($query->isFieldRequested(self::TYPE, 'tags') && $query->isIncluded($relationshipPath) && $api->increaseLevel()) {
             $tagResourceAdapter = $api->getResourceAdapter('tags');
             
             $tags = $data['tags'];

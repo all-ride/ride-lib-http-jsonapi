@@ -75,10 +75,14 @@ class JsonApi {
      * Creates a new resource
      * @param string $type Name of the resource type
      * @param string $id Id of the resource
+     * @param string $relationshipPath dot-separated list of the resource path
      * @return JsonApiResource
      */
-    public function createResource($type, $id) {
-        return new JsonApiResource($type, $id);
+    public function createResource($type, $id, $relationshipPath = null) {
+        $resource = new JsonApiResource($type, $id);
+        $resource->setRelationshipPath($relationshipPath);
+
+        return $resource;
     }
 
     /**

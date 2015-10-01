@@ -99,18 +99,32 @@ class JsonApiQuery {
     }
 
     /**
-     * Gets whether a reqource type is requested
-     * @param string $type Type of the resource
+     * Gets whether a relationship is requested
+     * @param string $relationshipPath dot-separated list of relationship name
      * @return boolean
      */
-    public function isResourceRequested($type) {
+    public function isIncluded($relationshipPath) {
         $include = $this->getInclude();
 
         if ($include === null) {
+            if (strpos($relationshipPath, '.') === false) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        if ($relationshipPath === null) {
             return true;
         }
 
-        return isset($include[$type]);
+        foreach ($include as $included => $null) {
+            if ($included == $relationshipPath || strpos($included, $relationshipPath . '.') === 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
