@@ -135,7 +135,7 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
      * @return boolean
      */
     public function hasContent() {
-        return $this->errors || $this->data !== false;
+        return $this->errors || $this->meta || $this->data !== false;
     }
 
     /**
