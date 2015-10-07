@@ -206,7 +206,7 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
         $this->parseDataLinks();
 
         // add included resources from the relationships
-        if ($data !== null) {
+        if ($data !==  null) {
             $this->includeRelationships($data->getRelationships());
         }
     }
