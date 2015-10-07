@@ -320,7 +320,11 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
      * @param JsonApiResource $resource
      * @return null
      */
-    protected function indexResource(JsonApiResource $resource) {
+    protected function indexResource(JsonApiResource $resource = null) {
+        if ($resource === null) {
+            return;
+        }
+
         if (!isset($this->index[$resource->getType()])) {
             $this->index[$resource->getType()] = array();
         }
