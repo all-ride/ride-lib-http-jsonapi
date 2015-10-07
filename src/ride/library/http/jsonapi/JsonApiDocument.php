@@ -361,8 +361,10 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
                 foreach ($this->data as $data) {
                     $value['data'][] = $data->getJsonValue(true);
                 }
-            } else {
+            } elseif ($this->data) {
                 $value['data'] = $this->data->getJsonValue(true);
+            } else {
+                $value['data'] = null;
             }
 
             if ($this->included) {
