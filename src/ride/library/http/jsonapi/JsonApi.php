@@ -22,6 +22,19 @@ class JsonApi {
     protected $resourceAdapters = array();
 
     /**
+     * Sets multiple resource adapters at once
+     * @param array $resourceAdapters Array with the type as key and the
+     * instance of the resource adapter as value
+     * @return null
+     * @see setResourceAdapter
+     */
+    public function setResourceAdapters(array $resourceAdapters) {
+        foreach ($resourceAdapters as $type => $resourceAdapter) {
+            $this->setResourceAdapter($type, $resourceAdapter);
+        }
+    }
+
+    /**
      * Sets a resource adapter for the provided type
      * @param string $type Name of the resource type
      * @param JsonApiResourceAdapter $resourceAdapter Resource adapter for the
