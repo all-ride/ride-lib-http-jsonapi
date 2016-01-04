@@ -52,6 +52,18 @@ class JsonApiQuery {
     const PARAMETER_SORT = 'sort';
 
     /**
+     * Ascending sort direction
+     * @var string
+     */
+    const SORT_ASC = 'ASC';
+
+    /**
+     * Descending sort direction
+     * @var string
+     */
+    const SORT_DESC = 'DESC';
+
+    /**
      * Received query parameters
      * @var array
      */
@@ -178,6 +190,14 @@ class JsonApiQuery {
     }
 
     /**
+     * Gets all the filters
+     * @return array Array with the name of the filter as key
+     */
+    public function getFilters() {
+        return $this->getParameter(self::PARAMETER_FILTER, null, array());
+    }
+
+    /**
      * Gets a filter by name
      * @param string $name Name of the filter
      * @param mixed $default Default value
@@ -287,11 +307,11 @@ class JsonApiQuery {
         $direction = substr($value, 0, 1);
         switch ($direction) {
             case '-':
-                return array(substr($value, 1), 'DESC');
+                return array(substr($value, 1), self::SORT_DESC);
             case '+':
                 $value = substr($value, 1);
             default:
-                return array($value, 'ASC');
+                return array($value, self::SORT_ASC);
         }
     }
 
