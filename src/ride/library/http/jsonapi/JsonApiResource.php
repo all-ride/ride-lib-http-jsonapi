@@ -90,6 +90,20 @@ class JsonApiResource extends AbstractLinkedJsonApiElement {
     }
 
     /**
+     * Gets an attribute of this resource
+     * @param string $name Name of the attribute
+     * @param mixed $default Default value for the attribute
+     * @return mixed
+     */
+    public function getAttribute($name, $default = null) {
+        if (!isset($this->attributes[$name])) {
+            return $default;
+        }
+
+        return $this->attributes[$name];
+    }
+
+    /**
      * Gets the attributes of this resource
      * @return array Array witht eh field name as key and the attribute as value
      */
@@ -105,6 +119,19 @@ class JsonApiResource extends AbstractLinkedJsonApiElement {
      */
     public function setRelationship($name, JsonApiRelationship $relationship) {
         $this->relationships[$name] = $relationship;
+    }
+
+    /**
+     * Gets a relationship of this resource
+     * @param string $name Name of the relationship
+     * @return JsonApiRelationship|null
+     */
+    public function getRelationship($name) {
+        if (!isset($this->relationships[$name])) {
+            return $default;
+        }
+
+        return $this->relationships[$name];
     }
 
     /**

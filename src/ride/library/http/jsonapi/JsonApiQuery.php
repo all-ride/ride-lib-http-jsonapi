@@ -99,7 +99,7 @@ class JsonApiQuery {
      */
     public function getInclude($default = null) {
         if ($this->include === false) {
-            $this->include = $this->getParameter(self::PARAMETER_INCLUDE, null, $default);
+            $this->include = $this->getParameter(self::PARAMETER_INCLUDE, $default);
             if ($this->include) {
                 $this->include = $this->parseArrayParameter($this->include, array($this, 'parseArrayItemGeneric'));
             } else {
@@ -149,7 +149,7 @@ class JsonApiQuery {
      */
     public function getFields($type, $default = null) {
         if ($this->fields === false) {
-            $this->fields = $this->getParameter(self::PARAMETER_FIELDS, null, $default);
+            $this->fields = $this->getParameter(self::PARAMETER_FIELDS, $default);
             if ($this->fields !== null) {
                 if (!is_array($this->fields)) {
                     $exception = new BadRequestJsonApiException('Provided fields parameter should be an array with the resource type as key and a comma separated field list as value.');
@@ -194,7 +194,7 @@ class JsonApiQuery {
      * @return array Array with the name of the filter as key
      */
     public function getFilters() {
-        return $this->getParameter(self::PARAMETER_FILTER, null, array());
+        return $this->getParameter(self::PARAMETER_FILTER, array());
     }
 
     /**
@@ -204,7 +204,7 @@ class JsonApiQuery {
      * @return mixed
      */
     public function getFilter($name, $default = null) {
-        return $this->getParameter(self::PARAMETER_FILTER, $name, $default);
+        return $this->getSubParameter(self::PARAMETER_FILTER, $name, $default);
     }
 
     /**
@@ -213,7 +213,7 @@ class JsonApiQuery {
      * @return integer
      */
     public function getLimit($default = null) {
-        $limit = $this->getParameter(self::PARAMETER_PAGE, 'limit', $default);
+        $limit = $this->getSubParameter(self::PARAMETER_PAGE, 'limit', $default);
         $limit = max(0, (integer) $limit);
 
         return $limit;
@@ -225,7 +225,7 @@ class JsonApiQuery {
      * @return integer
      */
     public function getOffset($default = null) {
-        $offset = $this->getParameter('page', 'offset', $default);
+        $offset = $this->getSubParameter('page', 'offset', $default);
         $offset = max(0, (integer) $offset);
 
         return $offset;
@@ -237,7 +237,7 @@ class JsonApiQuery {
      * @return array Array with the field as key and the sort direction as value
      */
     public function getSort($default = null) {
-        $sort = $this->getParameter(self::PARAMETER_SORT, null, $default);
+        $sort = $this->getParameter(self::PARAMETER_SORT, $default);
         $sort = $this->parseArrayParameter($sort, array($this, 'parseArrayItemSort'));
 
         return $sort;
@@ -246,19 +246,25 @@ class JsonApiQuery {
     /**
      * Gets a query parameter
      * @param string $name Name of the parameter
-     * @param string $subName Name of the sub parameter (next level)
      * @param mixed $default Value to return when the parameter is not set
      * @return mixed
      */
-    protected function getParameter($name, $subName = null, $default = null) {
+    public function getParameter($name, $default = null) {
         if (!isset($this->parameters[$name])) {
             return $default;
         }
 
-        if (!$subName) {
-            return $this->parameters[$name];
-        }
+        return $this->parameters[$name];
+    }
 
+    /**
+     * Gets a sub query parameter
+     * @param string $name Name of the parameter
+     * @param string $subName Name of the sub parameter (next level)
+     * @param mixed $default Value to return when the parameter is not set
+     * @return mixed
+     */
+    protected function getSubParameter($name, $subName, $default = null) {
         if (!isset($this->parameters[$name][$subName])) {
             return $default;
         }
