@@ -2,6 +2,8 @@
 
 namespace ride\library\http\jsonapi;
 
+use ride\library\http\jsonapi\exception\JsonApiException;
+
 /**
  * Abstract implementation of an element with links for the JSON API
  */
@@ -20,8 +22,8 @@ abstract class AbstractLinkedJsonApiElement extends AbstractJsonApiElement {
      * @return JsonApiLink
      */
     public function setLink($name, $link) {
-        if (is_string($link)) {
-            $link = new JsonApiLink($link);
+        if (is_string($link) || (is_object($link) && method_exists($link, '__toString'))) {
+            $link = new JsonApiLink((string) $link);
         } elseif (!$link instanceof JsonApiLink) {
             throw new JsonApiException('Could not set link to this element: provided link should be a string or a JsonApiLink object');
         }
@@ -29,6 +31,19 @@ abstract class AbstractLinkedJsonApiElement extends AbstractJsonApiElement {
         $this->links[$name] = $link;
 
         return $link;
+    }
+
+    /**
+     * Gets a link of this resource
+     * @param string $name Name of the link (self, related, ...)
+     * @return JsonApiLink|null
+     */
+    public function getLink($name) {
+        if (!isset($this->links[$name])) {
+            return null;
+        }
+
+        return $this->links[$name];
     }
 
     /**
