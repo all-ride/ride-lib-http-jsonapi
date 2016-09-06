@@ -28,12 +28,19 @@ abstract class AbstractJsonApiElement {
     }
 
     /**
-     * Gets the meta of this element
-     * @return array Array with the name of the meta as key and the meta as
-     * value
+     * Gets meta from this element
+     * @param string $meta Name of the meta to fetch or null for all meta
+     * @return array|mixed Array with all the meta when no $meta argument
+     * provided or the value of the meta with $default as fallback
      */
-    public function getMeta() {
-        return $this->meta;
+    public function getMeta($meta = null, $default = null) {
+        if ($meta === null) {
+            return $this->meta;
+        } elseif (!isset($this->meta[$meta])) {
+            return $default;
+        }
+
+        return $this->meta[$meta];
     }
 
 }

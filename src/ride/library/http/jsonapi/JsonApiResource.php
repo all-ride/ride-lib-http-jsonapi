@@ -128,7 +128,7 @@ class JsonApiResource extends AbstractLinkedJsonApiElement {
      */
     public function getRelationship($name) {
         if (!isset($this->relationships[$name])) {
-            return $default;
+            return null;
         }
 
         return $this->relationships[$name];
