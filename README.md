@@ -59,7 +59,8 @@ class BlogHandler {
         $query = $this->api->createQuery($_GET);
         $document = $this->api->createDocument($query);
         
-        $document->setResourceCollection($this->getBlogs($query));
+        $document->setResourceCollection($this->getBlogPosts($query, $total));
+        $document->setMeta('total', $total);
         
         http_status_code($document->getStatusCode());
         if ($document->hasContent()) {
@@ -69,11 +70,12 @@ class BlogHandler {
         }
     }
     
-    private function getBlogs(JsonApiDocument $document) {
-        // static resource for example, use the query to filter and manipulate the fetching of data
+    private function getBlogPosts(JsonApiDocument $document, &$total) {
+        // use the query to filter and manipulate the fetching of data
         $query = $document->getQuery();
-         
-        return array(
+        
+        // static data as an example
+        $blogPosts = array(
             1 => array(
                 'id' => 1,
                 'title' => 'Lorum Ipsum',
@@ -94,6 +96,14 @@ class BlogHandler {
             ),
             // ...
         );
+        
+        // count the total meta value
+        $total = count($blogPosts);
+        
+        // apply pagination
+        $blogPosts = array_slice($blogPosts, $query->getOffset(), $query->getLimit(10, 100));
+
+        return $blogPosts;
     }
 
 }
@@ -154,7 +164,7 @@ class BlogAdapter implements JsonApiResourceAdapter {
             $relationship->setLink('related', 'http://your-related-url');
                         
             // add the relationship to your resource
-            $resource->setRelationship('author', $relationship');
+            $resource->setRelationship('author', $relationship);
         }        
         
         // set a relationship collection value        
