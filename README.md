@@ -47,7 +47,7 @@ A controller for your API could be something like this:
 ```php
 <?php
 
-include ride\library\http\jsonapi\JsonApiDocument;
+include ride\library\http\jsonapi\JsonApiQuery;
 include ride\library\http\jsonapi\JsonApi;
 
 /**
@@ -70,7 +70,9 @@ class BlogPostController {
         $query = $this->api->createQuery($_GET);
         $document = $this->api->createDocument($query);
         
-        $document->setResourceCollection($this->getBlogPosts($query, $total));
+        $blogPosts = $this->getBlogPosts($query, $total);
+        
+        $document->setResourceCollection(BlogPostResourceAdapter::TYPE, $blogPosts);
         $document->setMeta('total', $total);
         
         http_status_code($document->getStatusCode());
@@ -83,14 +85,11 @@ class BlogPostController {
     
     /**
      * Gets the blog posts from the data source
-     * @param ride\library\http\jsonapi\JsonApiDocument $document Requested document
-     * @param integer $total
+     * @param ride\library\http\jsonapi\JsonApiQuery $query Requested query
+     * @param integer $total Total results before pagination
      * @return array
      */
-    private function getBlogPosts(JsonApiDocument $document, &$total) {
-        // use the query to filter and manipulate the fetching of data
-        $query = $document->getQuery();
-        
+    private function getBlogPosts(JsonApiQuery $query, &$total) {
         // static data as an example
         $blogPosts = array(
             1 => array(
@@ -114,7 +113,7 @@ class BlogPostController {
             // ...
         );
         
-        // count the total meta value
+        // count the total
         $total = count($blogPosts);
         
         // apply pagination
@@ -140,13 +139,13 @@ include ride\library\http\jsonapi\JsonApiResourceAdapter;
 /**
  * Resource adapter for a blog post
  */
-class BlogAdapter implements JsonApiResourceAdapter {
+class BlogPostResourceAdapter implements JsonApiResourceAdapter {
    
     /**
      * Type of this resource
      * @var string
      */ 
-    const TYPE = 'blogs';
+    const TYPE = 'blog-posts';
     
     /**
      * Gets a resource instance for the provided model data
