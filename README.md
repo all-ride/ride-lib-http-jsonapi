@@ -47,14 +47,25 @@ A controller for your API could be something like this:
 ```php
 <?php
 
+include ride\library\http\jsonapi\JsonApiDocument;
 include ride\library\http\jsonapi\JsonApi;
 
-class BlogHandler {
+/**
+ * Controller for the blog post API
+ */
+class BlogPostController {
     
+    /**
+     * Constructs a new controller
+     * @param ride\library\http\jsonapi\JsonApi $api
+     */
     public function __construct(JsonApi $api) {
         $this->api = $api;
     }
     
+    /**
+     * Action to fetch a collection of blog posts
+     */
     public function indexAction() {
         $query = $this->api->createQuery($_GET);
         $document = $this->api->createDocument($query);
@@ -70,6 +81,12 @@ class BlogHandler {
         }
     }
     
+    /**
+     * Gets the blog posts from the data source
+     * @param ride\library\http\jsonapi\JsonApiDocument $document Requested document
+     * @param integer $total
+     * @return array
+     */
     private function getBlogPosts(JsonApiDocument $document, &$total) {
         // use the query to filter and manipulate the fetching of data
         $query = $document->getQuery();
@@ -103,6 +120,7 @@ class BlogHandler {
         // apply pagination
         $blogPosts = array_slice($blogPosts, $query->getOffset(), $query->getLimit(10, 100));
 
+        // return the result
         return $blogPosts;
     }
 
@@ -110,6 +128,8 @@ class BlogHandler {
 ```
 
 ### Implement A Resource Adapter
+
+The resource adapter for the blog posts in the previous example could be something like this:
 
 ```php
 <?php
@@ -131,9 +151,9 @@ class BlogAdapter implements JsonApiResourceAdapter {
     /**
      * Gets a resource instance for the provided model data
      * @param mixed $data Data to adapt
-     * @param JsonApiDocument $document Requested document
+     * @param ride\library\http\jsonapi\JsonApiDocument $document Requested document
      * @param string $relationshipPath dot-separated list of relationship names
-     * @return JsonApiResource
+     * @return ride\library\http\jsonapi\JsonApiResource
      */
     public function getResource($data, JsonApiDocument $document, $relationshipPath = null) {
         $api = $document->getApi();
@@ -182,7 +202,7 @@ class BlogAdapter implements JsonApiResourceAdapter {
             $relationship->setLink('self', 'http://your-relationship-url');
             $relationship->setLink('related', 'http://your-related-url');
                                     
-            $resource->setRelationship('tags', $relationship');
+            $resource->setRelationship('tags', $relationship);
         }
         
         // return the resource
