@@ -328,7 +328,7 @@ class JsonApiDocumentTest extends PHPUnit_Framework_TestCase {
                 'meta1' => 'value1',
             ),
             'links' => array(
-                'self' => $document1->getLink('self'),//url',
+                'self' => $document1->getLink('self'),
             ),
         );
 

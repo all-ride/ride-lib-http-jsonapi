@@ -2,7 +2,6 @@
     "name": "ride/lib-http-jsonapi",
     "description": "JSON API library of the Ride framework",
     "license": "MIT",
-    "version": "0.3.0",
     "authors": [
         {
             "name": "Joris Vandeweerd",
