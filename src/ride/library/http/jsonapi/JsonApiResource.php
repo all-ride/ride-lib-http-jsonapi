@@ -3,7 +3,7 @@
 namespace ride\library\http\jsonapi;
 
 /**
- * Interface for a JSON API resource
+ * Data container for a JSON API resource
  */
 class JsonApiResource extends AbstractLinkedJsonApiElement {
 
@@ -128,7 +128,7 @@ class JsonApiResource extends AbstractLinkedJsonApiElement {
      */
     public function getRelationship($name) {
         if (!isset($this->relationships[$name])) {
-            return $default;
+            return null;
         }
 
         return $this->relationships[$name];

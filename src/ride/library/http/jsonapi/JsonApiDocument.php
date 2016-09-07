@@ -1,5 +1,7 @@
 <?php namespace ride\library\http\jsonapi;
 
+use ride\library\http\jsonapi\exception\JsonApiException;
+
 use \JsonSerializable;
 
 /**
@@ -105,6 +107,10 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
      * @return null
      */
     public function setStatusCode($statusCode) {
+        if ($statusCode !== null && (!is_integer($statusCode) || $statusCode < 100 || $statusCode > 599)) {
+            throw new JsonApiException('Could not set status code: provided code is an invalid status code');
+        }
+
         $this->statusCode = $statusCode;
     }
 
@@ -161,6 +167,28 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
     }
 
     /**
+     * Sets the data of this document
+     * @param array|JsonApiResource $data
+     * @return null
+     */
+    protected function setData($data) {
+        $this->data = $data;
+        $this->errors = array();
+
+        // set the resource links as document links
+        $this->parseDataLinks();
+    }
+
+    /**
+     * Gets the data of this document
+     * @return boolean|JsonApiResource|array A JsonApiResource instance or a
+     * collection of resources if set, false otherwise
+     */
+    public function getData() {
+        return $this->data;
+    }
+
+    /**
      * Sets a resource collection as data of this document
      * @param string $type Name of the resource type
      * @param array $collection Array of data objects for the adapter of the
@@ -170,10 +198,9 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
      */
     public function setResourceCollection($type, array $collection) {
         foreach ($collection as $index => $data) {
-            if (!$data instanceof AbstractJsonApiElement) {
+            if (!$data instanceof JsonApiResource) {
                 $data = $this->adaptResource($type, $data);
             }
-
 
             $collection[$index] = $data;
 
@@ -181,8 +208,7 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
             $this->includeRelationships($data->getRelationships());
         }
 
-        $this->data = array_values($collection);
-        $this->errors = false;
+        $this->setData(array_values($collection));
     }
 
     /**
@@ -193,20 +219,16 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
      * @see JsonApiResourceAdapter
      */
     public function setResourceData($type, $data) {
-        if (!$data instanceof AbstractJsonApiElement) {
+        if (!$data instanceof JsonApiResource) {
             $data = $this->adaptResource($type, $data);
         }
 
         $this->indexResource($data);
 
-        $this->data = $data;
-        $this->errors = false;
-
-        // set the resource links as document links
-        $this->parseDataLinks();
+        $this->setData($data);
 
         // add included resources from the relationships
-        if ($data !==  null) {
+        if ($data !== null) {
             $this->includeRelationships($data->getRelationships());
         }
     }
@@ -217,9 +239,7 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
      * @return null
      */
     public function setRelationshipData(JsonApiRelationship $relationship) {
-        $this->data = $relationship->getData();
-
-        $this->parseDataLinks();
+        $this->setData($relationship->getData());
     }
 
     /**
@@ -250,6 +270,12 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
      * @return JsonApiResource
      */
     protected function adaptResource($type, $data) {
+        if ($data === null) {
+            return null;
+        } elseif (!$this->api) {
+            throw new JsonApiException('Could not adapt resource: no API set to the document');
+        }
+
         $resourceAdapter = $this->api->getResourceAdapter($type);
 
         return $resourceAdapter->getResource($data, $this);

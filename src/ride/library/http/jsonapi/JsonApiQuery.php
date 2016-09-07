@@ -94,17 +94,19 @@ class JsonApiQuery {
 
     /**
      * Gets the requested included resources
-     * @param string $default Default value for the include parameter
-     * @return array Array with the resource type as key
+     * @return array|null Array with the resource type as key or null when no
+     * includes are defined
      */
-    public function getInclude($default = null) {
-        if ($this->include === false) {
-            $this->include = $this->getParameter(self::PARAMETER_INCLUDE, $default);
-            if ($this->include) {
-                $this->include = $this->parseArrayParameter($this->include, array($this, 'parseArrayItemGeneric'));
-            } else {
-                $this->include = null;
-            }
+    public function getInclude() {
+        if ($this->include !== false) {
+            return $this->include;
+        }
+
+        $this->include = $this->getParameter(self::PARAMETER_INCLUDE);
+        if ($this->include) {
+            $this->include = $this->parseArrayParameter($this->include, array($this, 'parseArrayItemGeneric'));
+        } else {
+            $this->include = null;
         }
 
         return $this->include;
@@ -141,15 +143,14 @@ class JsonApiQuery {
 
     /**
      * Gets the requested included fields
-     * @param string $default Default value for the fields parameter of the
-     * provided type
+     * @param string $type Type to get the fields for
      * @return array Array with the included field name as key
      * @throws \ride\library\http\jsonapi\exception\BadRequestJsonApiException
      * when the fields parameter is invalid
      */
-    public function getFields($type, $default = null) {
+    public function getFields($type) {
         if ($this->fields === false) {
-            $this->fields = $this->getParameter(self::PARAMETER_FIELDS, $default);
+            $this->fields = $this->getParameter(self::PARAMETER_FIELDS);
             if ($this->fields !== null) {
                 if (!is_array($this->fields)) {
                     $exception = new BadRequestJsonApiException('Provided fields parameter should be an array with the resource type as key and a comma separated field list as value.');
@@ -158,8 +159,8 @@ class JsonApiQuery {
                     throw $exception;
                 }
 
-                foreach ($this->fields as $type => $typeFields) {
-                    $this->fields[$type] = $this->parseArrayParameter($typeFields, array($this, 'parseArrayItemGeneric'));
+                foreach ($this->fields as $fieldType => $fieldFields) {
+                    $this->fields[$fieldType] = $this->parseArrayParameter($fieldFields, array($this, 'parseArrayItemGeneric'));
                 }
             } else {
                 $this->fields = array();
@@ -210,25 +211,41 @@ class JsonApiQuery {
     /**
      * Gets the requested limit
      * @param integer $default Default value for the limit parameter
+     * @param integer $maximum Maximum value for the limit parameter
      * @return integer
      */
-    public function getLimit($default = null) {
-        $limit = $this->getSubParameter(self::PARAMETER_PAGE, 'limit', $default);
-        $limit = max(0, (integer) $limit);
+    public function getLimit($default = 1000, $maximum = null) {
+        $limit = $this->getSubParameter(self::PARAMETER_PAGE, self::PARAMETER_LIMIT, $default);
 
-        return $limit;
+        if (!is_numeric($limit) || $limit < 1) {
+            $exception = new BadRequestJsonApiException('Provided limit parameter should be an integer greater then or equals to 1.');
+            $exception->setParameter(self::PARAMETER_PAGE);
+
+            throw $exception;
+        } elseif ($maximum && $limit > $maximum) {
+            $exception = new BadRequestJsonApiException('Provided limit parameter cannot be greater than ' . $maximum . '.');
+            $exception->setParameter(self::PARAMETER_PAGE);
+
+            throw $exception;
+        }
+
+        return (integer) $limit;
     }
 
     /**
      * Gets the requested offset
-     * @param integer $default Default value for the offset parameter
      * @return integer
      */
-    public function getOffset($default = null) {
-        $offset = $this->getSubParameter('page', 'offset', $default);
-        $offset = max(0, (integer) $offset);
+    public function getOffset() {
+        $offset = $this->getSubParameter(self::PARAMETER_PAGE, self::PARAMETER_OFFSET, 0);
+        if (!is_numeric($offset) || $offset < 0) {
+            $exception = new BadRequestJsonApiException('Provided offset parameter should be an integer greater then or equals to 0.');
+            $exception->setParameter(self::PARAMETER_PAGE);
 
-        return $offset;
+            throw $exception;
+        }
+
+        return (integer) $offset;
     }
 
     /**
@@ -282,6 +299,8 @@ class JsonApiQuery {
 
         if (!$list) {
             return $result;
+        } elseif (!is_string($list)) {
+            throw new BadRequestJsonApiException('Could not parse parameter: value should be a string');
         }
 
         $array = explode(',', $list);

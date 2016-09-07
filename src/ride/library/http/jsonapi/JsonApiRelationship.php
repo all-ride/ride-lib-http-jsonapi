@@ -46,7 +46,7 @@ class JsonApiRelationship extends AbstractLinkedJsonApiElement implements JsonSe
 
     /**
      * Gets the set data
-     * @return array|JsonApiResource
+     * @return boolean|JsonApiResource|array
      * @see setResourceCollection
      * @see setResource
      */
@@ -60,7 +60,7 @@ class JsonApiRelationship extends AbstractLinkedJsonApiElement implements JsonSe
      */
     public function jsonSerialize() {
         if (!$this->links && $this->data === false && !$this->meta) {
-            throw new JsonApiException('Could not get json value: A relationship MUST contain at least a links, data or meta top-level member');
+            throw new JsonApiException('Could not get json value: A relationship MUST contain at least links, data or a meta top-level member');
         }
 
         $value = array();
