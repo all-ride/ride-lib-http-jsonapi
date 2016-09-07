@@ -13,5 +13,10 @@
         "psr-0": {
             "ride\\library\\http\\jsonapi": ["src/"]
         }
+    },
+    "autoload-dev": {
+        "psr-0": {
+            "ride\\library\\http\\jsonapi": ["test/src/"]
+        }
     }
 }

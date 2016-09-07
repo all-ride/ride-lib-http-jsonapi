@@ -3,7 +3,7 @@
 namespace ride\library\http\jsonapi;
 
 /**
- * Interface for a JSON API resource
+ * Data container for a JSON API resource
  */
 class JsonApiResource extends AbstractLinkedJsonApiElement {
 

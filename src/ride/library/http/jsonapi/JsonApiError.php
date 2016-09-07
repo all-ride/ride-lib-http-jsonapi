@@ -2,6 +2,8 @@
 
 namespace ride\library\http\jsonapi;
 
+use ride\library\http\jsonapi\exception\JsonApiException;
+
 use \JsonSerializable;
 
 /**
@@ -61,6 +63,10 @@ class JsonApiError extends AbstractLinkedJsonApiElement implements JsonSerializa
      * @return null
      */
     public function setId($id) {
+        if ($id !== null && !is_numeric($id) && !is_string($id)) {
+            throw new JsonApiException('Could not set the id of the error: value should be a number or a string');
+        }
+
         $this->id = $id;
     }
 
@@ -75,9 +81,13 @@ class JsonApiError extends AbstractLinkedJsonApiElement implements JsonSerializa
     /**
      * Sets the HTTP status code of this error
      * @param string $code
-          * @return null
+     * @return null
      */
     public function setStatusCode($statusCode) {
+        if ($statusCode !== null && (!is_numeric($statusCode) || $statusCode < 400 || $statusCode > 599)) {
+            throw new JsonApiException('Could not set the status code of the error: value should be an integer between 400 (4XX client error) and 599 (5XX server error)');
+        }
+
         $this->statusCode = $statusCode;
     }
 
@@ -95,6 +105,10 @@ class JsonApiError extends AbstractLinkedJsonApiElement implements JsonSerializa
      * @return null
      */
     public function setCode($code) {
+        if ($code !== null && !is_numeric($code) && !is_string($code)) {
+            throw new JsonApiException('Could not set the code of the error: value should be a number or a string');
+        }
+
         $this->code = $code;
     }
 
@@ -112,6 +126,10 @@ class JsonApiError extends AbstractLinkedJsonApiElement implements JsonSerializa
      * @return null
      */
     public function setTitle($title) {
+        if ($title !== null && !is_string($title)) {
+            throw new JsonApiException('Could not set the title of the error: value should be a string');
+        }
+
         $this->title = $title;
     }
 
@@ -130,6 +148,10 @@ class JsonApiError extends AbstractLinkedJsonApiElement implements JsonSerializa
      * @return null
      */
     public function setDetail($detail) {
+        if ($detail !== null && !is_string($detail)) {
+            throw new JsonApiException('Could not set the detail of the error: value should be a string');
+        }
+
         $this->detail = $detail;
     }
 
@@ -149,6 +171,10 @@ class JsonApiError extends AbstractLinkedJsonApiElement implements JsonSerializa
      * @return null
      */
     public function setSourcePointer($sourcePointer) {
+        if ($sourcePointer !== null && !is_string($sourcePointer)) {
+            throw new JsonApiException('Could not set the source pointer of the error: value should be a string');
+        }
+
         $this->sourcePointer = $sourcePointer;
     }
 
@@ -163,17 +189,23 @@ class JsonApiError extends AbstractLinkedJsonApiElement implements JsonSerializa
 
     /**
      * Sets the query parameter which causes this error
-     * @param string $sourcePointer a JSON pointer to the associated entity
+     * @param string $sourceParameter string indicating which URI query
+     * parameter caused the error
      * @return null
      */
     public function setSourceParameter($sourceParameter) {
+        if ($sourceParameter !== null && !is_string($sourceParameter)) {
+            throw new JsonApiException('Could not set the source parameter of the error: value should be a string');
+        }
+
         $this->sourceParameter = $sourceParameter;
     }
 
     /**
      * Gets the source pointer of a resource attribute or relationship which
      * causes this error
-     * @return string a JSON pointer to the associated entity
+     * @return string a string indicating which URI query parameter caused the
+     * error
      */
     public function getSourceParameter() {
         return $this->sourceParameter;
@@ -184,6 +216,19 @@ class JsonApiError extends AbstractLinkedJsonApiElement implements JsonSerializa
      * @return array
      */
     public function jsonSerialize() {
+        if ($this->id === null &&
+            $this->statusCode === null &&
+            $this->code === null &&
+            $this->title === null &&
+            $this->detail === null &&
+            $this->sourcePointer === null &&
+            $this->sourceParameter === null &&
+            !$this->links &&
+            !$this->meta
+        ) {
+            throw new JsonApiException('Could not serialize the error: no properties set to this error, set at least one property using a setter');
+        }
+
         $value = array();
 
         if ($this->id) {

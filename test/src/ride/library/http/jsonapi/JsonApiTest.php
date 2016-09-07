@@ -11,7 +11,7 @@ class JsonApiTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testResourceAdapter() {
-        $resourceAdapter = $this->getMock('ride\\library\\http\\jsonapi\\JsonApiResourceAdapter');
+        $resourceAdapter = $this->getMockBuilder('ride\\library\\http\\jsonapi\\JsonApiResourceAdapter')->getMock();
 
         $resourceAdapters = array(
             'test1' => $resourceAdapter,
@@ -97,7 +97,7 @@ class JsonApiTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testCreateErrorWithArguments() {
-        $statusCode = 200;
+        $statusCode = 400;
         $code = 'code';
         $title = 'title';
         $detail = 'detail';

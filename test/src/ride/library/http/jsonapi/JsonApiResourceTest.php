@@ -88,8 +88,76 @@ class JsonApiResourceTest extends AbstractLinkedJsonApiElementTest {
         $this->assertNull($resource->getRelationship('relationship3'));
     }
 
-    public function testGetJsonValue() {
+    /**
+     * @dataProvider providerGetJsonValue
+     */
+    public function testGetJsonValue($expected, JsonApiResource $resource, $full) {
+        $this->assertEquals($expected, $resource->getJsonValue($full));
+    }
 
+    public function providerGetJsonValue() {
+        $resource1 = $this->createTestInstance();
+
+        $relationship = new JsonApiRelationship();
+        $relationship->setResource($resource1);
+
+        $resource2 = $this->createTestInstance();
+        $resource2->setAttribute('attribute1', 'value1');
+        $resource2->setAttribute('attribute2', 'value2');
+        $resource2->setRelationship('relationship', $relationship);
+        $resource2->setMeta('meta1', 'value1');
+        $resource2->setLink('link1', 'http://url.to.link');
+        $resource2->setLink('link2', 'http://url.to.link');
+        $resource2->setRelationshipPath('path.to.instance');
+
+        return array(
+            array(
+                array(
+                    'type' => $resource1->getType(),
+                    'id' => $resource1->getId()
+                ),
+                $resource1,
+                false,
+            ),
+            array(
+                array(
+                    'type' => $resource1->getType(),
+                    'id' => $resource1->getId()
+                ),
+                $resource1,
+                true,
+            ),
+            array(
+                array(
+                    'type' => $resource2->getType(),
+                    'id' => $resource2->getId()
+                ),
+                $resource2,
+                false,
+            ),
+            array(
+                array(
+                    'type' => $resource2->getType(),
+                    'id' => $resource2->getId(),
+                    'attributes' => array(
+                        'attribute1' => 'value1',
+                        'attribute2' => 'value2',
+                    ),
+                    'relationships' => array(
+                        'relationship' => $relationship,
+                    ),
+                    'meta' => array(
+                        'meta1' => 'value1',
+                    ),
+                    'links' => array(
+                        'link1' => new JsonApiLink('http://url.to.link'),
+                        'link2' => new JsonApiLink('http://url.to.link'),
+                    ),
+                ),
+                $resource2,
+                true,
+            ),
+        );
     }
 
 }

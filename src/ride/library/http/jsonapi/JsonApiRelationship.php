@@ -46,7 +46,7 @@ class JsonApiRelationship extends AbstractLinkedJsonApiElement implements JsonSe
 
     /**
      * Gets the set data
-     * @return array|JsonApiResource
+     * @return boolean|JsonApiResource|array
      * @see setResourceCollection
      * @see setResource
      */
