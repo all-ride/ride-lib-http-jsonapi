@@ -2,9 +2,9 @@
 
 namespace ride\library\http\jsonapi;
 
-use \PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class JsonApiDocumentTest extends PHPUnit_Framework_TestCase {
+class JsonApiDocumentTest extends TestCase {
 
     public function setUp() {
         $this->document = new JsonApiDocument();
@@ -31,6 +31,13 @@ class JsonApiDocumentTest extends PHPUnit_Framework_TestCase {
         $this->document->setQuery($query);
 
         $this->assertEquals($this->document->getQuery(), $query);
+    }
+
+    /**
+     * @expectedException ride\library\http\jsonapi\exception\JsonApiException
+     */
+    public function testSetStatusCodeShouldThrowJsonApiException() {
+        $this->document->setStatusCode(6000);
     }
 
     public function testStatusCode() {
