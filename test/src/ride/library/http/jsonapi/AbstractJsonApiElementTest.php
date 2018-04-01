@@ -2,9 +2,9 @@
 
 namespace ride\library\http\jsonapi;
 
-use \PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractJsonApiElementTest extends PHPUnit_Framework_TestCase {
+abstract class AbstractJsonApiElementTest extends TestCase {
 
     abstract protected function createTestInstance();
 
