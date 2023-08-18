@@ -3,6 +3,7 @@
 namespace ride\library\http\jsonapi;
 
 use \JsonSerializable;
+use ReturnTypeWillChange;
 
 /**
  * Interface for a JSON API link
@@ -36,6 +37,7 @@ class JsonApiLink extends AbstractJsonApiElement implements JsonSerializable {
      * Specifies the data which should be serialized to JSON
      * @return string|array
      */
+    #[ReturnTypeWillChange]
     public function jsonSerialize() {
         if (!$this->meta) {
             return $this->href;
