@@ -1,5 +1,6 @@
 <?php namespace ride\library\http\jsonapi;
 
+use ReturnTypeWillChange;
 use ride\library\http\jsonapi\exception\JsonApiException;
 
 use \JsonSerializable;
@@ -63,6 +64,8 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
      * Specifies the data which should be serialized to JSON
      * @return scalar
      */
+
+    #[ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->getJsonValue();
     }
@@ -107,7 +110,7 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
      * @return null
      */
     public function setStatusCode($statusCode) {
-        if ($statusCode !== null && (!is_integer($statusCode) || $statusCode < 100 || $statusCode > 599)) {
+        if ($statusCode !== null && (!is_int($statusCode) || $statusCode < 100 || $statusCode > 599)) {
             throw new JsonApiException('Could not set status code: provided code is an invalid status code');
         }
 
@@ -121,9 +124,13 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
     public function getStatusCode() {
         if ($this->statusCode) {
             return $this->statusCode;
-        } elseif (!$this->hasContent()) {
+        }
+
+        if (!$this->hasContent()) {
             return 204; // no content
-        } elseif ($this->errors) {
+        }
+
+        if ($this->errors) {
             foreach ($this->errors as $error) {
                 if ($error->getStatusCode()) {
                     return $error->getStatusCode();
@@ -131,9 +138,9 @@ class JsonApiDocument extends AbstractLinkedJsonApiElement implements JsonSerial
             }
 
             return 400; // bad request
-        } else {
-            return 200; // ok
         }
+
+        return 200; // ok
     }
 
     /**

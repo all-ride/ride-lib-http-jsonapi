@@ -121,7 +121,7 @@ class JsonApiQuery {
         $include = $this->getInclude();
 
         if ($include === null) {
-            if (strpos($relationshipPath, '.') === false) {
+            if ($relationshipPath && strpos($relationshipPath, '.') === false) {
                 return true;
             } else {
                 return false;

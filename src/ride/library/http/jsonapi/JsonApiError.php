@@ -2,6 +2,7 @@
 
 namespace ride\library\http\jsonapi;
 
+use ReturnTypeWillChange;
 use ride\library\http\jsonapi\exception\JsonApiException;
 
 use \JsonSerializable;
@@ -215,7 +216,8 @@ class JsonApiError extends AbstractLinkedJsonApiElement implements JsonSerializa
      * Specifies the data which should be serialized to JSON
      * @return array
      */
-    public function jsonSerialize() {
+    #[ReturnTypeWillChange]
+    public function jsonSerialize(): array {
         if ($this->id === null &&
             $this->statusCode === null &&
             $this->code === null &&
