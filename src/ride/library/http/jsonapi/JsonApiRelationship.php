@@ -2,9 +2,9 @@
 
 namespace ride\library\http\jsonapi;
 
+use JsonSerializable;
+use ReturnTypeWillChange;
 use ride\library\http\jsonapi\exception\JsonApiException;
-
-use \JsonSerializable;
 
 /**
  * Relationship of a JSON API resource
@@ -58,7 +58,8 @@ class JsonApiRelationship extends AbstractLinkedJsonApiElement implements JsonSe
      * Specifies the data which should be serialized to JSON
      * @return scalar
      */
-    public function jsonSerialize() {
+    #[ReturnTypeWillChange]
+    public function jsonSerialize(): float|array|bool|int|string {
         if (!$this->links && $this->data === false && !$this->meta) {
             throw new JsonApiException('Could not get json value: A relationship MUST contain at least links, data or a meta top-level member');
         }
