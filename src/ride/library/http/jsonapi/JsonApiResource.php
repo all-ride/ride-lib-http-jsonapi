@@ -31,6 +31,8 @@ class JsonApiResource extends AbstractLinkedJsonApiElement {
      */
     protected $relationships;
 
+    protected $relationshipPath;
+
     /**
      * Constructs a new resource
      * @param string $type Type of the resource
